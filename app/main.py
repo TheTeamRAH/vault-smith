@@ -19,7 +19,7 @@ def encrypt(vault_id: str, variable: str, value: str) -> str:
     if not value:
         raise ValueError("Value is required")
     proc = subprocess.run(
-        ["ansible-vault", "encrypt_string", "--vault-id", f"{vault_id}@prompt", "--name", variable, value],
+        ["ansible-vault", "encrypt_string", "--vault-id", f"{vault_id}@/dev/stdin", "--name", variable, value],
         input=password + "\n", text=True, capture_output=True, check=False,
     )
     if proc.returncode:
