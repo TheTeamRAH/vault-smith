@@ -1,0 +1,8 @@
+services:
+  ansible-vault-web:
+    build: .
+    restart: unless-stopped
+    environment:
+      ANSIBLE_VAULT_PROD: ${ANSIBLE_VAULT_PROD:?set ANSIBLE_VAULT_PROD in the deployment environment}
+    ports:
+      - "8080:8080"
