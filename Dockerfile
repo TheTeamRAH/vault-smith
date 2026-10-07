@@ -5,6 +5,8 @@ COPY --from=uv /uv /uvx /bin/
 WORKDIR /app
 
 ENV PATH="/app/.venv/bin:${PATH}" \
+    HOME=/tmp \
+    ANSIBLE_LOCAL_TEMP=/tmp/ansible-tmp \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     PYTHONDONTWRITEBYTECODE=1 \
