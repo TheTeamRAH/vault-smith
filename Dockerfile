@@ -16,4 +16,4 @@ RUN addgroup --system app && adduser --system --ingroup app app && chown -R app:
 USER app
 
 EXPOSE 8080
-CMD ["uv", "run", "--no-dev", "python", "app/main.py"]
+CMD ["/app/.venv/bin/python", "app/main.py"]
