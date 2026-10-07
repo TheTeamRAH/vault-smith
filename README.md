@@ -8,10 +8,12 @@ Install [uv](https://docs.astral.sh/uv/) and run:
 
 ```bash
 uv sync
-ANSIBLE_VAULT_HOME=not-a-real-password uv run python app/main.py
+cp .env.example .env
+# Edit .env and set ANSIBLE_VAULT_RAH before starting the app.
+uv run python app/main.py
 ```
 
-Run the tests with `uv run pytest`. The lockfile is committed so local and container installs use the same resolved dependencies. Deploy with `docker compose up -d --build`; set vault variables in the deployment environment first. The app currently supports encryption only; the API/UI are structured so a future decrypt flow can be added separately.
+Run the tests with `uv run pytest`. The lockfile is committed so local and container installs use the same resolved dependencies. Deploy with `docker compose -f docker-compose.yml up -d --build`; set the vault password in an untracked `.env` file first. The app currently supports encryption only; the API/UI are structured so a future decrypt flow can be added separately.
 
 ## Security boundary
 
