@@ -1,2 +1,21 @@
+[project]
+name = "vaultsmith"
+version = "0.1.0"
+description = "Mobile-friendly web UI for ansible-vault encrypt_string"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ansible-core>=2.16,<3",
+    "flask>=3.0,<4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<9",
+]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.uv]
+package = false

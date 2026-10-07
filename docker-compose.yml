@@ -1,0 +1,10 @@
+---
+services:
+  vaultsmith:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "3260:8080"
+...

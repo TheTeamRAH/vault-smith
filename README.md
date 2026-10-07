@@ -4,13 +4,16 @@ A small containerised web UI for `ansible-vault encrypt_string`, designed for sa
 
 ## Development
 
+Install [uv](https://docs.astral.sh/uv/) and run:
+
 ```bash
-python -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt
-ANSIBLE_VAULT_HOME=not-a-real-password python app/main.py
+uv sync
+cp .env.example .env
+# Edit .env and set ANSIBLE_VAULT_RAH before starting the app.
+uv run python app/main.py
 ```
 
-Run tests with `pytest`. Deploy with `docker compose up -d --build`; set vault variables in the deployment environment first. The app currently supports encryption only; the API/UI are structured so a future decrypt flow can be added separately.
+Run the tests with `uv run pytest`. The lockfile is committed so local and container installs use the same resolved dependencies. Deploy with `docker compose -f docker-compose.yml up -d --build`; set the vault password in an untracked `.env` file first. A variable name is optional: leave it blank to generate only the indented encrypted content block, without the `!vault |` header, for embedding under an existing variable.
 
 ## Security boundary
 

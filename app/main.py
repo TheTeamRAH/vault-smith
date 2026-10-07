@@ -1,8 +1,12 @@
+import logging
 import os
 import subprocess
+import sys
+from pathlib import Path
 from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
 
 
 def vaults():
@@ -12,19 +16,30 @@ def vaults():
 
 def encrypt(vault_id: str, variable: str, value: str) -> str:
     password = os.environ.get(f"ANSIBLE_VAULT_{vault_id}")
-    if not password:
+    if not vault_id or not password:
         raise ValueError("Unknown vault")
-    if not variable or not variable.replace("_", "").isalnum() or variable[0].isdigit():
+    if variable and (not variable.replace("_", "").isalnum() or variable[0].isdigit()):
         raise ValueError("Variable names must start with a letter and contain letters, numbers, or underscores")
     if not value:
         raise ValueError("Value is required")
+    ansible_vault = Path(sys.executable).with_name("ansible-vault")
+    command = [str(ansible_vault), "encrypt_string", "--vault-id", f"{vault_id}@/dev/stdin"]
+    if variable:
+        command.extend(["--name", variable])
+    command.append(value)
     proc = subprocess.run(
-        ["ansible-vault", "encrypt_string", "--vault-id", f"{vault_id}@prompt", "--name", variable, value],
+        command,
         input=password + "\n", text=True, capture_output=True, check=False,
     )
     if proc.returncode:
+        logger.error("ansible-vault failed (exit %s): %s", proc.returncode, proc.stderr.strip() or "no stderr")
         raise RuntimeError("ansible-vault failed")
-    return proc.stdout
+    lines = proc.stdout.rstrip("\n").splitlines()
+    header = lines[0] if variable and lines else ""
+    content = lines[1:] if lines and (variable or lines[0].strip() == "!vault |") else lines
+    content = [f"  {line.lstrip()}" for line in content if line.strip()]
+    output = [header, *content] if variable else content
+    return "\n".join(output) + "\n"
 
 
 @app.get("/")
