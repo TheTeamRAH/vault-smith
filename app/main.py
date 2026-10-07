@@ -16,15 +16,19 @@ def vaults():
 
 def encrypt(vault_id: str, variable: str, value: str) -> str:
     password = os.environ.get(f"ANSIBLE_VAULT_{vault_id}")
-    if not password:
+    if not vault_id or not password:
         raise ValueError("Unknown vault")
-    if not variable or not variable.replace("_", "").isalnum() or variable[0].isdigit():
+    if variable and (not variable.replace("_", "").isalnum() or variable[0].isdigit()):
         raise ValueError("Variable names must start with a letter and contain letters, numbers, or underscores")
     if not value:
         raise ValueError("Value is required")
     ansible_vault = Path(sys.executable).with_name("ansible-vault")
+    command = [str(ansible_vault), "encrypt_string", "--vault-id", f"{vault_id}@/dev/stdin"]
+    if variable:
+        command.extend(["--name", variable])
+    command.append(value)
     proc = subprocess.run(
-        [str(ansible_vault), "encrypt_string", "--vault-id", f"{vault_id}@/dev/stdin", "--name", variable, value],
+        command,
         input=password + "\n", text=True, capture_output=True, check=False,
     )
     if proc.returncode:
