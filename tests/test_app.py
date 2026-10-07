@@ -29,7 +29,10 @@ def test_encrypt_without_variable_returns_content_only():
         run.return_value.stdout = "!vault |\n          $ANSIBLE_VAULT;1.2;AES256;HOME\n"
         response = app.test_client().post("/api/encrypt", json={"vault_id":"HOME", "variable":"", "value":"bar"})
         assert response.status_code == 200
-        assert response.json["result"].startswith("!vault |\n  $ANSIBLE_VAULT")
+        output = response.json["result"]
+        assert output.startswith("  $ANSIBLE_VAULT")
+        assert "!vault |" not in output
+        assert all(line.startswith("  ") for line in output.splitlines())
         assert "--name" not in run.call_args.args[0]
 
 

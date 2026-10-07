@@ -13,7 +13,7 @@ cp .env.example .env
 uv run python app/main.py
 ```
 
-Run the tests with `uv run pytest`. The lockfile is committed so local and container installs use the same resolved dependencies. Deploy with `docker compose -f docker-compose.yml up -d --build`; set the vault password in an untracked `.env` file first. A variable name is optional: leave it blank to generate only the `!vault |` content block for embedding under an existing variable.
+Run the tests with `uv run pytest`. The lockfile is committed so local and container installs use the same resolved dependencies. Deploy with `docker compose -f docker-compose.yml up -d --build`; set the vault password in an untracked `.env` file first. A variable name is optional: leave it blank to generate only the indented encrypted content block, without the `!vault |` header, for embedding under an existing variable.
 
 ## Security boundary
 
