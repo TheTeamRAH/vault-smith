@@ -1,8 +1,12 @@
+import logging
 import os
 import subprocess
+import sys
+from pathlib import Path
 from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
 
 
 def vaults():
@@ -18,11 +22,13 @@ def encrypt(vault_id: str, variable: str, value: str) -> str:
         raise ValueError("Variable names must start with a letter and contain letters, numbers, or underscores")
     if not value:
         raise ValueError("Value is required")
+    ansible_vault = Path(sys.executable).with_name("ansible-vault")
     proc = subprocess.run(
-        ["ansible-vault", "encrypt_string", "--vault-id", f"{vault_id}@/dev/stdin", "--name", variable, value],
+        [str(ansible_vault), "encrypt_string", "--vault-id", f"{vault_id}@/dev/stdin", "--name", variable, value],
         input=password + "\n", text=True, capture_output=True, check=False,
     )
     if proc.returncode:
+        logger.error("ansible-vault failed (exit %s): %s", proc.returncode, proc.stderr.strip() or "no stderr")
         raise RuntimeError("ansible-vault failed")
     return proc.stdout
 

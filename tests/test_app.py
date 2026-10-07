@@ -15,6 +15,7 @@ def test_encrypt_returns_ansible_output():
         response = app.test_client().post("/api/encrypt", json={"vault_id":"HOME", "variable":"foo", "value":"bar"})
         assert response.status_code == 200
         assert response.json["result"].startswith("foo: !vault")
+        assert run.call_args.args[0][0].endswith("/ansible-vault")
         assert run.call_args.args[0][3] == "HOME@/dev/stdin"
         run.assert_called_once()
 
