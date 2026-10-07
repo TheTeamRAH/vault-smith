@@ -30,7 +30,10 @@ def encrypt(vault_id: str, variable: str, value: str) -> str:
     if proc.returncode:
         logger.error("ansible-vault failed (exit %s): %s", proc.returncode, proc.stderr.strip() or "no stderr")
         raise RuntimeError("ansible-vault failed")
-    return proc.stdout
+    lines = proc.stdout.rstrip("\n").splitlines()
+    if len(lines) > 1:
+        lines[1:] = [f"  {line.lstrip()}" for line in lines[1:] if line.strip()]
+    return "\n".join(lines) + "\n"
 
 
 @app.get("/")
